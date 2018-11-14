@@ -1,13 +1,33 @@
 import javax.swing.*;
-        import java.awt.*;
-        import java.awt.event.*;
-        import java.text.DecimalFormat;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.IOException;
+import java.io.Writer;
+import java.text.DecimalFormat;
 
 public class Calculator {
     private Calculate calculate = new Calculate();
     private JFrame mainFrame;
     private JPanel area_of_Button;
-    private JTextField area_of_Outcome;
+    private TextBox area_of_Outcome;
+    private class TextBox extends JTextField{
+        private TextBox(String text){
+            super(text);
+        }
+        private double GetNum(){
+            double num;
+            try{
+                num = Double.valueOf(this.getText());
+            }
+            catch (Exception e){
+                this.setText("0");
+                num = 0;
+            }
+            return num;
+        }
+
+
+    }
     private JButton
             b00=new JButton("7"),
             b01=new JButton("8"),
@@ -36,7 +56,46 @@ public class Calculator {
         mainFrame.setPreferredSize(new Dimension(480,360));
         Font btnFont = new Font("",Font.PLAIN,36);
         area_of_Button = new JPanel();
-        area_of_Outcome = new JTextField(String.valueOf(calculate.result));
+        area_of_Outcome = new TextBox("0");
+        area_of_Outcome.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                char keyChar = e.getKeyChar();
+                if (keyChar >=  '0' && keyChar <= '9') {
+                    if(flag){
+                        area_of_Outcome.setText("");
+                        flag = false;
+                    }
+                }
+                else if (keyChar == '+'){
+                    Plus plus = new Plus();
+                    plus.actionPerformed(null);
+                    e.consume();
+                }else if (keyChar == '-'){
+                    Minus minus = new Minus();
+                    minus.actionPerformed(null);
+                    e.consume();
+                }else if (keyChar == '*'){
+                    Multiply multiply = new Multiply();
+                    multiply.actionPerformed(null);
+                    e.consume();
+                }else if (keyChar == '/'){
+                    Divide divide = new Divide();
+                    divide.actionPerformed(null);
+                    e.consume();
+                }else if (keyChar == '='){
+                    Equal equal = new Equal();
+                    equal.actionPerformed(null);
+                    e.consume();
+                }else if (keyChar == '.'){
+                    if (area_of_Outcome.getText().indexOf('.') != -1)
+                        e.consume();
+                }else {
+                    e.consume();
+                }
+
+            }
+        });
         area_of_Outcome.setHorizontalAlignment(JTextField.RIGHT);
         mainFrame.add(area_of_Outcome,BorderLayout.NORTH);
         area_of_Outcome.setFont(new Font("",Font.PLAIN,48));
@@ -209,7 +268,7 @@ public class Calculator {
 
     class Plus implements ActionListener{
         public void actionPerformed(ActionEvent press){
-            double inNum = Double.valueOf(area_of_Outcome.getText());
+            double inNum = area_of_Outcome.GetNum();
             calculate.Plus(inNum);
             area_of_Outcome.setText(String.valueOf(new DecimalFormat("#.##########").format(calculate.getResult())));
             flag = true;
@@ -218,7 +277,7 @@ public class Calculator {
 
     class Minus implements ActionListener{
         public void actionPerformed(ActionEvent press){
-            double inNum = Double.valueOf(area_of_Outcome.getText());
+            double inNum = area_of_Outcome.GetNum();
             calculate.Minus(inNum);
             area_of_Outcome.setText(String.valueOf(new DecimalFormat("#.##########").format(calculate.getResult())));
             flag = true;
@@ -226,7 +285,7 @@ public class Calculator {
     }
     class Multiply implements ActionListener{
         public void actionPerformed(ActionEvent press){
-            double inNum = Double.valueOf(area_of_Outcome.getText());
+            double inNum = area_of_Outcome.GetNum();
             calculate.Multiply(inNum);
             area_of_Outcome.setText(String.valueOf(new DecimalFormat("#.##########").format(calculate.getResult())));
             flag = true;
@@ -244,7 +303,7 @@ public class Calculator {
 
     class Equal implements ActionListener{
         public void actionPerformed(ActionEvent press){
-            double inNum = Double.valueOf(area_of_Outcome.getText());
+            double inNum = area_of_Outcome.GetNum();
             calculate.Equal(inNum);
             area_of_Outcome.setText(String.valueOf(new DecimalFormat("#.##########").format(calculate.getResult())));
             flag = true;
